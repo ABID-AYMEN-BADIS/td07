@@ -16,13 +16,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up PHP with PHPUnit
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: mbstring, bcmath, xml
-        coverage: xdebug
-        tools: phpunit
+    - name: Run PHPUnit in Docker
+      run: |
+        docker run --rm \
+          -v $GITHUB_WORKSPACE:/var/www/html \
+          -w /var/www/html \
+          php:8.3-cli \
+          bash -c "
+            # Installer Composer
+            curl -sS https://getcomposer.org/installer | php;
+            mv composer.phar /usr/local/bin/composer;
 
-    - name: Run PHPUnit
-      run: phpunit --configuration phpunit.xml
+            # Installer les dépendances avec Composer
+            composer install --prefer-dist --no-interaction;
+
+            # Exécuter les tests PHPUnit
+            ./vendor/bin/phpunit"
