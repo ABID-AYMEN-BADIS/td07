@@ -26,8 +26,6 @@ jobs:
     - name: Install dependencies
       run: composer install
 
-    - name: Give execute permission to phpunit
-      run: chmod +x ./vendor/bin/phpunit  
 
     - name: Run PHPUnit
-      run: ./vendor/bin/phpunit
+      run: $GITHUB_WORKSPACE/vendor/bin/phpunit
