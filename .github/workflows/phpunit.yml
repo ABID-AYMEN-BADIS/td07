@@ -3,10 +3,10 @@ name: PHP PHPUnit Tests
 on:
   pull_request:
     branches:
-      - main  
+      - master
   push:
     branches:
-      - main  
+      - master  
 
 jobs:
   phpunit:
@@ -16,15 +16,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'  
-        extensions: mbstring, bcmath, xml
-        coverage: xdebug
+    - name: Run PHPUnit in Docker
+      run: |
+        docker run --rm \
+          -v $GITHUB_WORKSPACE:/var/www/html \
+          -w /var/www/html \
+          php:8.3-cli \
+          bash -c "
+            # Installer Composer
+            curl -sS https://getcomposer.org/installer | php;
+            mv composer.phar /usr/local/bin/composer;
 
-    - name: Install dependencies
-      run: composer install
+            # Installer les dépendances avec Composer
+            composer install --prefer-dist --no-interaction;
 
-    - name: Run PHPUnit
-      run: ./vendor/bin/phpunit
+            # Exécuter les tests PHPUnit
+            ./vendor/bin/phpunit"
