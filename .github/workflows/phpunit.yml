@@ -16,13 +16,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Docker
-      uses: docker://php:8.3-cli
-
     - name: Run PHPUnit in Docker
       run: |
         docker run --rm \
           -v $GITHUB_WORKSPACE:/var/www/html \
           -w /var/www/html \
           php:8.3-cli \
-          bash -c "composer install && ./vendor/bin/phpunit"
+          bash -c "
+            # Installer Composer
+            curl -sS https://getcomposer.org/installer | php;
+            mv composer.phar /usr/local/bin/composer;
+
+            # Installer les dépendances avec Composer
+            composer install --prefer-dist --no-interaction;
+
+            # Exécuter les tests PHPUnit
+            ./vendor/bin/phpunit"
