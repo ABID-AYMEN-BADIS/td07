@@ -8,7 +8,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
-    - uses: php-actions/composer@v6
-    
-    - uses: php-actions/phpunit@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, intl, pdo, pdo_mysql
+
+    - name: Install Composer dependencies
+      run: composer install --no-progress --prefer-dist
+
+    - name: Run PHPUnit with configuration
+      run: php vendor/bin/phpunit --configuration phpunit.xml
